@@ -31,6 +31,14 @@ MAALI_SYSTEM_CYGNET_FILE=1
 # for creating the module
 MAALI_PYTHON_LIB_VERSION=`echo "$MAALI_TOOL_VERSION" | cut -d '.' -f 1,2`
 
+# tool pre-requisites modules needed to configure and build python
+MAALI_TOOL_PREREQ="sqlite/3.38.5 "
+
+# this is the configuration option settings 
+MAALI_TOOL_CONFIGURE='--enable-loadable-sqlite-extensions '
+MAALI_TOOL_CONFIGURE+=' --enable-unicode=ucs4 '
+MAALI_TOOL_CONFIGURE+=' --enable-optimizations '
+
 # for auto-building module files
 MAALI_MODULE_SET_MAALI_PYTHON_LIBDIR='lib'
 MAALI_MODULE_SET_MAALI_PYTHON_LIB_VERSION='$MAALI_PYTHON_LIB_VERSION'
@@ -46,13 +54,16 @@ MAALI_WGET_EXTRA=--no-check-certificate
 ##############################################################################
 
 function maali_build {
+  # allow for late evaluation
+  MAALI_TOOL_CONFIGURE_EVAL=`eval echo "$MAALI_TOOL_CONFIGURE"`
   cd "$MAALI_TOOL_BUILD_DIR"
-
-  maali_run "./configure --prefix=$MAALI_INSTALL_DIR --enable-shared --enable-unicode=ucs4"
+  LDFLAGS="-L$MAALI_SQLITE_HOME/lib"
+  CPPFLAGS="-I$MAALI_SQLITE_HOME/include"
+  maali_run "./configure --prefix=$MAALI_INSTALL_DIR --enable-shared $MAALI_TOOL_CONFIGURE_EVAL"
   maali_run "make -j $MAALI_CORES"
   maali_run "make install"
   maali_run "make clean"
-  maali_run "./configure --prefix=$MAALI_INSTALL_DIR --enable-unicode=ucs4"
+  maali_run "./configure --prefix=$MAALI_INSTALL_DIR $MAALI_TOOL_CONFIGURE_EVAL"
   maali_run "make -j $MAALI_CORES"
   maali_run "make install"
 }

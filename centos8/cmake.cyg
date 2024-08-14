@@ -36,8 +36,7 @@ MAALI_MODULE_SET_PATH=1
 
 function maali_build {
   # cmake uses bootstrap
-  MAALI_INSTALL_DIR="${MAALI_ROOT}/${MAALI_TOOL_TYPE}/${MAALI_TOOL_NAME}/${MAALI_TOOL_VERSION}"  
-  maali_run "./bootstrap --prefix=$MAALI_INSTALL_DIR"
+  maali_run "./bootstrap --parallel=16 --prefix=$MAALI_INSTALL_DIR"
   maali_run "make"
   maali_run "make install"
 }
